@@ -1,0 +1,99 @@
+ext {
+    /* Language */
+    gradlePluginVersion = '3.1.2'
+    kotlinVersion = '1.2.31'
+
+    /* Android */
+    supportLibraryVersion = '27.1.0'
+    designSupportLibraryVersion = supportLibraryVersion
+    recyclerViewVersion = supportLibraryVersion
+    cardViewVersion = supportLibraryVersion
+    constraintLayoutVersion = '1.1.0'
+
+    /* Libraries */
+    toothpickVerion = '1.1.3'
+    roomVersion = '1.0.0'
+    glideVersion = '4.7.1'
+    retrofitVersion = '2.4.0'
+    okHttpVersion = '3.10.0'
+    rxJavaVersion = '2.1.12'
+    rxAndroidVersion = '2.0.2'
+    leakCanaryVersion = '1.5.4'
+    rvAnimationsVersion = '2.3.0'
+    rxBindingVersion = '2.1.1'
+    timberVersion = '4.6.1'
+    moxyVersion = '1.5.3'
+
+    /* Testing */
+    junitVersion = '4.12'
+    espressoVersion = '3.0.1'
+    mockitoVersion = '2.8.47'
+    testRunnerVersion = '1.0.1'
+
+    languageDependencies = [
+            gradlePlugin: "com.android.tools.build:gradle:$gradlePluginVersion",
+            kotlinPlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion",
+            kotlinStdlib: "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    ]
+
+    androidDependencies = [
+            appcompatv7         : "com.android.support:appcompat-v7:$supportLibraryVersion",
+            designSupportLibrary: "com.android.support:design:$designSupportLibraryVersion",
+            recyclerView        : "com.android.support:recyclerview-v7:$recyclerViewVersion",
+            cardView            : "com.android.support:cardview-v7:$cardViewVersion",
+            constraintLayout    : "com.android.support.constraint:constraint-layout:$constraintLayoutVersion",
+    ]
+
+    libraryDependencies = [
+            toothpickRuntime        : "com.github.stephanenicolas.toothpick:toothpick-runtime:$toothpickVersion",
+            toothpickAndroid        : "com.github.stephanenicolas.toothpick:smoothie:$toothpickVersion",
+            toothpickCompiler       : "com.github.stephanenicolas.toothpick:toothpick-compiler:$toothpickVersion",
+
+            room                    : "android.arch.persistence.room:runtime:$roomVersion",
+            roomCompiler            : "android.arch.persistence.room:compiler:$roomVersion",
+            roomRx                  : "android.arch.persistence.room:rxjava2:$roomVersion",
+            roomTesting             : "android.arch.persistence.room:testing:$roomVersion",
+
+            glide                   : "com.github.bumptech.glide:glide:$glideVersion",
+            glideCompiler           : "com.github.bumptech.glide:compiler:$glideVersion",
+            glideOkHttp             : "com.github.bumptech.glide:okhttp3-integration:$glideVersion",
+
+            retrofit                : "com.squareup.retrofit2:retrofit:$retrofitVersion",
+            retrofitRxAdapter       : "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion",
+            moshiConverter          : "com.squareup.retrofit2:converter-moshi:$retrofitVersion",
+
+            okHttpLoggingInterceptor: "com.squareup.okhttp3:logging-interceptor:$okHttpVersion",
+
+            rxJava                  : "io.reactivex.rxjava2:rxjava:$rxJavaVersion",
+            rxAndroid               : "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion",
+            rxPermissions           : "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion@aar",
+
+            leakCanary              : "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion",
+            leakCanaryNoOp          : "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion",
+
+            rvAnimations            : "jp.wasabeef:recyclerview-animators:$rvAnimationsVersion",
+
+            rxBinding               : "com.jakewharton.rxbinding2:rxbinding:$rxBindingVersion",
+            rxBindingV4             : "com.jakewharton.rxbinding2:rxbinding-support-v4:$rxBindingVersion",
+            rxBindingV7             : "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxBindingVersion",
+            rxBindingDesign         : "com.jakewharton.rxbinding2:rxbinding-design:$rxBindingVersion",
+            rxBindingRv             : "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$rxBindingVersion",
+
+            timber                  : "com.jakewharton.timber:timber:$timberVersion",
+
+            moxy                    : "com.arello-mobile:moxy:${moxyVersion}",
+            moxyAppcompat           : "com.arello-mobile:moxy-app-compat:${moxyVersion}",
+            moxyAnnotations         : "com.arello-mobile:moxy-compiler:${moxyVersion}",
+    ]
+
+    testingDependencies = [
+            junit         : "junit:junit:$junitVersion",
+            espresso      : "com.android.support.test.espresso:espresso-core:$espressoVersion",
+            testRunner    : "com.android.support.test:runner:$testRunnerVersion",
+
+            mockitoInline : "org.mockito:mockito-inline:$mockitoVersion",
+            mockitoAndroid: "org.mockito:mockito-android:$mockitoVersion",
+            mockRetrofit  : "com.squareup.retrofit2:retrofit-mock:$retrofitVersion",
+            mockOkHttp    : "com.squareup.okhttp3:mockwebserver:$okHttpVersion",
+    ]
+}
