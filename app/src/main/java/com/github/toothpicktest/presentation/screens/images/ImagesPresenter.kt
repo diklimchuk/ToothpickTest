@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 
 @InjectViewState
-@MainActivity.Presenter
+@ImagesScope
 class ImagesPresenter @Inject constructor(
 
 ) : BasePresenter<ImagesView>() {

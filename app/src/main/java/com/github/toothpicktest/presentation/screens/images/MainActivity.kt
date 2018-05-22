@@ -11,21 +11,19 @@ import kotlinx.android.synthetic.main.activity_main.toolbar
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieSupportActivityModule
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.CLASS
 
 class MainActivity : BaseActivity(), ImagesView {
 
     private val scope: Scope by lazy {
         Toothpick.openScopes(DiScope.APP, DiScope.IMAGES)
-                .apply { bindScopeAnnotation(Presenter::class.java) }
+                .apply { bindScopeAnnotation(ImagesScope::class.java) }
     }
 
     @InjectPresenter
     internal lateinit var presenter: ImagesPresenter
 
     @ProvidePresenter
-    fun providePresenter() = scope.getInstance(ImagesPresenter::class.java)
+    fun providePresenter(): ImagesPresenter = scope.getInstance(ImagesPresenter::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Toothpick.inject(this, scope)
@@ -39,10 +37,4 @@ class MainActivity : BaseActivity(), ImagesView {
     private fun initRecyclerView() {
         images.adapter = ImagesAdapter(this)
     }
-
-
-    @javax.inject.Scope
-    @Target(CLASS)
-    @Retention(RUNTIME)
-    annotation class Presenter
 }
