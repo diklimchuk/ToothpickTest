@@ -1,8 +1,8 @@
 package com.github.toothpicktest.di
 
 import com.github.toothpicktest.BuildConfig
-import com.github.toothpicktest.data.FlickrApi
-import com.github.toothpicktest.data.interceptor.FlickrAuthInterceptor
+import com.github.toothpicktest.data.network.FlickrApi
+import com.github.toothpicktest.data.network.interceptor.FlickrAuthInterceptor
 import com.github.toothpicktest.di.provider.FlickrApiProvider
 import com.github.toothpicktest.di.provider.OkHttpClientProvider
 import okhttp3.Interceptor

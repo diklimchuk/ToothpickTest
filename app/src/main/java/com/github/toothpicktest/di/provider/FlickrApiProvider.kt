@@ -1,6 +1,6 @@
 package com.github.toothpicktest.di.provider
 
-import com.github.toothpicktest.data.FlickrApi
+import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.di.ApiBaseUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

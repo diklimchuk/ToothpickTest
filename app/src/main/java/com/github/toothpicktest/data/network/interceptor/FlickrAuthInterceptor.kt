@@ -1,4 +1,4 @@
-package com.github.toothpicktest.data.interceptor
+package com.github.toothpicktest.data.network.interceptor
 
 import com.github.toothpicktest.di.FlickrApiKey
 import okhttp3.HttpUrl

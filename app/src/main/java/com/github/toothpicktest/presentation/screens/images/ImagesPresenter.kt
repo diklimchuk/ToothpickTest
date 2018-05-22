@@ -2,7 +2,7 @@ package com.github.toothpicktest.presentation.screens.images
 
 import android.util.Log
 import com.arellomobile.mvp.InjectViewState
-import com.github.toothpicktest.data.FlickrApi
+import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
