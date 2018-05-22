@@ -18,7 +18,11 @@ class ImagesAdapter(
         private val activity: Activity
 ) : RecyclerView.Adapter<ImageViewHolder>() {
 
-    private val images = mutableListOf<Image>()
+    init {
+        setHasStableIds(true)
+    }
+
+    private val images = arrayListOf<Image>()
 
     class ImageViewHolder(
             view: View
@@ -34,6 +38,8 @@ class ImagesAdapter(
         val view = li.inflate(R.layout.item_image, parent, false)
         return ImageViewHolder(view)
     }
+
+    override fun getItemId(position: Int): Long = images[position].id
 
     override fun getItemCount(): Int = images.size
 
