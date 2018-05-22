@@ -6,6 +6,7 @@ import com.github.toothpicktest.BuildConfig
 import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.di.NetworkModule
 import com.github.toothpicktest.di.RepoModule
+import timber.log.Timber
 import toothpick.Toothpick
 import toothpick.config.Module
 import toothpick.configuration.Configuration
@@ -24,6 +25,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        configureTimber()
+
         if (!BuildConfig.DEBUG) {
             Toothpick.setConfiguration(Configuration.forProduction().disableReflection())
             FactoryRegistryLocator.setRootRegistry(com.github.toothpicktest.FactoryRegistry())
@@ -37,5 +40,11 @@ class App : Application() {
                 NetworkModule(BuildConfig.API_BASE_URL, BuildConfig.FLICKR_API_KEY),
                 RepoModule()
         )
+    }
+
+    private fun configureTimber() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 }

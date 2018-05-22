@@ -1,11 +1,11 @@
 package com.github.toothpicktest.presentation.screens.images
 
-import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.github.toothpicktest.domain.repo.IImageRepo
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -25,9 +25,9 @@ class ImagesPresenter @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Log.e("tmp", it.toString())
+                    Timber.e(it.toString())
                 }, {
-                    Log.e("tmp", "", it)
+                    Timber.e(it)
                 })
     }
 }
