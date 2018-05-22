@@ -1,5 +1,6 @@
 package com.github.toothpicktest.data.interceptor
 
+import com.github.toothpicktest.di.FlickrApiKey
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * Interceptor that will provide authentication for Flickr api
  */
 class FlickrAuthInterceptor @Inject constructor(
-        private val flickrApiKey: String
+        @FlickrApiKey private val flickrApiKey: String
 ) : Interceptor {
 
     companion object {
@@ -50,7 +51,7 @@ class FlickrAuthInterceptor @Inject constructor(
 
     private fun isAuthRequired(request: Request): Boolean {
         return request.headers()
-                .values(FLICKR_AUTH)
-                .isNotEmpty()
+                .values(FLICKR_AUTH_HEADER)
+                .contains("true")
     }
 }

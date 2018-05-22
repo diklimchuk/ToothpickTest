@@ -31,6 +31,9 @@ class App : Application() {
         }
 
         val appScope = Toothpick.openScope(DiScope.APP)
-        appScope.installModules(appModule, NetworkModule(BuildConfig.API_BASE_URL))
+        appScope.installModules(
+                appModule,
+                NetworkModule(BuildConfig.API_BASE_URL, BuildConfig.FLICKR_API_KEY)
+        )
     }
 }
