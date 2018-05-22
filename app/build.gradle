@@ -44,6 +44,10 @@ dependencies {
     implementation libraryDependencies.toothpickRuntime
     implementation libraryDependencies.toothpickAndroid
     kapt libraryDependencies.toothpickCompiler
+    // Retrofit
+    implementation libraryDependencies.retrofit
+    implementation libraryDependencies.retrofitRxAdapter
+    implementation libraryDependencies.moshiConverter
     // Glide
     implementation libraryDependencies.glide
     implementation libraryDependencies.glideOkHttp
