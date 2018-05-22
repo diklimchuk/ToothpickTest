@@ -11,11 +11,20 @@ interface FlickrApi {
 
     @GET("rest")
     @Headers(FlickrAuthInterceptor.FLICKR_AUTH)
-    fun getImages(
+    fun searchImages(
+            @Query("tags") tags: String,
             @Query("method") method: String = "flickr.photos.search",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
-            @Query("tags") tags: String = "car,cars,image",
+            @Query("page") page: String = "1"
+    ): Single<JsonImagesResponse>
+
+    @GET("rest")
+    @Headers(FlickrAuthInterceptor.FLICKR_AUTH)
+    fun recentImages(
+            @Query("method") method: String = "flickr.photos.getRecent",
+            @Query("format") format: String = "json",
+            @Query("nojsoncallback") noJsonCallback: Int = 1,
             @Query("page") page: String = "1"
     ): Single<JsonImagesResponse>
 }

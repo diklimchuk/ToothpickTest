@@ -12,6 +12,10 @@ class ImageRepo @Inject constructor(
         private val api: FlickrApi
 ) : IImageRepo {
     override fun getImages(): Single<List<Image>> = api
-            .getImages()
+            .recentImages()
+            .map { it.photos.photo.map(JsonImage::toModel) }
+
+    override fun getImages(tag: String): Single<List<Image>> = api
+            .searchImages(tag)
             .map { it.photos.photo.map(JsonImage::toModel) }
 }

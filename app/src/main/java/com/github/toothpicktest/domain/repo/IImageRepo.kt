@@ -5,4 +5,6 @@ import io.reactivex.Single
 
 interface IImageRepo {
     fun getImages(): Single<List<Image>>
+
+    fun getImages(tag: String): Single<List<Image>>
 }
