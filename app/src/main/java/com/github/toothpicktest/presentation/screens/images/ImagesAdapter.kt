@@ -1,4 +1,4 @@
-package com.github.toothpicktest.presentation
+package com.github.toothpicktest.presentation.screens.images
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.github.toothpicktest.R
-import com.github.toothpicktest.presentation.ImagesAdapter.ImageViewHolder
+import com.github.toothpicktest.presentation.screens.images.ImagesAdapter.ImageViewHolder
 import kotlinx.android.synthetic.main.item_image.view.image
 
 class ImagesAdapter(

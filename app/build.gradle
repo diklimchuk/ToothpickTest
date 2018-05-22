@@ -19,6 +19,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ toothpick_registry_package_name : 'com.github.toothpicktest' ]
+            }
+        }
+    }
 }
 
 dependencies {
