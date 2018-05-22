@@ -14,6 +14,7 @@ interface FlickrApi {
     fun searchImages(
             @Query("tags") tags: String,
             @Query("method") method: String = "flickr.photos.search",
+            @Query("extras") extras: String = "date_upload",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
             @Query("page") page: String = "1"
@@ -23,6 +24,7 @@ interface FlickrApi {
     @Headers(FlickrAuthInterceptor.FLICKR_AUTH)
     fun recentImages(
             @Query("method") method: String = "flickr.photos.getRecent",
+            @Query("extras") extras: String = "date_upload",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
             @Query("page") page: String = "1"

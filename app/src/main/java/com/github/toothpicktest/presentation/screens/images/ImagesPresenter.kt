@@ -6,6 +6,7 @@ import com.github.toothpicktest.presentation.mvp.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.Date
 import javax.inject.Inject
 
 
@@ -21,7 +22,7 @@ class ImagesPresenter @Inject constructor(
     }
 
     private fun getImages() {
-        repo.getImages()
+        repo.getImages(Date(99999999999), 100)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ viewState.showImages(it) }, { Timber.e(it) })

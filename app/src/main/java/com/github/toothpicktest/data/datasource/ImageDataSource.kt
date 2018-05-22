@@ -1,11 +1,10 @@
-package com.github.toothpicktest.domain.repo
+package com.github.toothpicktest.data.datasource
 
 import com.github.toothpicktest.domain.entity.Image
 import io.reactivex.Single
 import java.util.Date
 
-interface IImageRepo {
-
+interface ImageDataSource {
     fun getImages(
             afterDate: Date,
             quantity: Int
