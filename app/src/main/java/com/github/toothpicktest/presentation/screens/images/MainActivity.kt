@@ -5,6 +5,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.toothpicktest.R.layout
 import com.github.toothpicktest.di.DiScope
+import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.mvp.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.images
 import kotlinx.android.synthetic.main.activity_main.toolbar
@@ -25,6 +26,8 @@ class MainActivity : BaseActivity(), ImagesView {
     @ProvidePresenter
     fun providePresenter(): ImagesPresenter = scope.getInstance(ImagesPresenter::class.java)
 
+    private val adapter = ImagesAdapter(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Toothpick.inject(this, scope)
         scope.installModules(SmoothieSupportActivityModule(this))
@@ -35,6 +38,10 @@ class MainActivity : BaseActivity(), ImagesView {
     }
 
     private fun initRecyclerView() {
-        images.adapter = ImagesAdapter(this)
+        images.adapter = adapter
+    }
+
+    override fun showImages(images: Collection<Image>) {
+        adapter.replaceImages(images)
     }
 }

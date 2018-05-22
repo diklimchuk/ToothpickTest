@@ -24,10 +24,6 @@ class ImagesPresenter @Inject constructor(
         repo.getImages()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    Timber.e(it.toString())
-                }, {
-                    Timber.e(it)
-                })
+                .subscribe({ viewState.showImages(it) }, { Timber.e(it) })
     }
 }
