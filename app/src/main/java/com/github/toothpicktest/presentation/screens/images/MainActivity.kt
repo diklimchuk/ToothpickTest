@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.toothpicktest.R.layout
-import com.github.toothpicktest.presentation.di.DiScope
+import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.presentation.mvp.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.images
 import kotlinx.android.synthetic.main.activity_main.toolbar

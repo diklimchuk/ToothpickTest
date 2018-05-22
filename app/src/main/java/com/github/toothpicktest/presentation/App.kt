@@ -3,7 +3,8 @@ package com.github.toothpicktest.presentation
 import android.app.Application
 import android.content.Context
 import com.github.toothpicktest.BuildConfig
-import com.github.toothpicktest.presentation.di.DiScope
+import com.github.toothpicktest.di.DiScope
+import com.github.toothpicktest.di.NetworkModule
 import toothpick.Toothpick
 import toothpick.config.Module
 import toothpick.configuration.Configuration
@@ -11,6 +12,13 @@ import toothpick.registries.FactoryRegistryLocator
 import toothpick.registries.MemberInjectorRegistryLocator
 
 class App : Application() {
+
+    private val appModule = object : Module() {
+        init {
+            bind(Context::class.java)
+                    .toInstance(this@App)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -23,11 +31,6 @@ class App : Application() {
         }
 
         val appScope = Toothpick.openScope(DiScope.APP)
-        appScope.installModules(object : Module() {
-            init {
-                bind(Context::class.java)
-                        .toInstance(this@App)
-            }
-        })
+        appScope.installModules(appModule, NetworkModule(BuildConfig.API_BASE_URL))
     }
 }

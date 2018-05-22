@@ -12,6 +12,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "API_BASE_URL", '"https://api.flickr.com/services"'
     }
     buildTypes {
         release {
@@ -48,6 +50,7 @@ dependencies {
     implementation libraryDependencies.retrofit
     implementation libraryDependencies.retrofitRxAdapter
     implementation libraryDependencies.moshiConverter
+    implementation libraryDependencies.okHttpLoggingInterceptor
     // Glide
     implementation libraryDependencies.glide
     implementation libraryDependencies.glideOkHttp
