@@ -7,6 +7,7 @@ import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
 import com.github.toothpicktest.presentation.screens.images.filter.ImageOrder.UPDATE_DATE
 import com.github.toothpicktest.presentation.screens.images.filter.ImageOrder.UPLOAD_DATE
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -46,4 +47,17 @@ class NetworkImageDataSource @Inject constructor(
             .observeOn(Schedulers.computation())
             .map { it.photos.photo.map(JsonImage::toModel) }
             .map { it.sortedByDescending { it.uploadDate.time } }
+
+    override fun hasImages(
+            filter: ImageFilter,
+            page: Int,
+            quantity: Int
+    ): Completable = Completable.complete()
+
+    override fun saveImages(
+            filter: ImageFilter,
+            page: Int,
+            pageSize: Int,
+            images: List<Image>
+    ): Completable = Completable.error(UnsupportedOperationException())
 }
