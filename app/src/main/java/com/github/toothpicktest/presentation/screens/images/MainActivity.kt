@@ -110,8 +110,11 @@ class MainActivity : BaseActivity(), ImagesView {
         search.setQuery(tag, false)
     }
 
-    override fun showHistoryTags(tags: List<String>) {
+    override fun showHistoryTags() {
         suggestions.visibility = View.VISIBLE
+    }
+
+    override fun replaceHistoryTags(tags: List<String>) {
         suggestionsAdapter.replaceItems(tags)
     }
 

@@ -23,7 +23,10 @@ interface ImagesView : BaseView {
     fun hideHistoryTags()
 
     @StateStrategyType(AddToEndSingleByTagStateStrategy::class, tag = "tagHistory")
-    fun showHistoryTags(tags: List<String>)
+    fun showHistoryTags()
+
+    @StateStrategyType(SkipStrategy::class)
+    fun replaceHistoryTags(tags: List<String>)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showError(message: String)

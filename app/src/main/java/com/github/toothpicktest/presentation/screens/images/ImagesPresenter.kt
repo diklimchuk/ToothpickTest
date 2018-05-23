@@ -31,7 +31,7 @@ class ImagesPresenter @Inject constructor(
     }
 
     private var lastLoadedPage = 0
-    private var lastVisibleItemOrderValue = MAX_DATE
+    private var lastItemOrderValue = MAX_DATE
 
     private val tagRequests = PublishSubject.create<ImageFilter>()
     private val pageRequests = PublishSubject.create<Int>()
@@ -47,12 +47,9 @@ class ImagesPresenter @Inject constructor(
     }
 
     fun onSearchFocused() {
+        viewState.showHistoryTags()
         cancelHistoryTagsRequests()
-        getHistoryTags.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ viewState.showHistoryTags(it) }, this::showError)
-                .bind()
-                .bindHistoryTagsRequest()
+        loadHistoryTags()
     }
 
     fun onSearchLostFocus() {
@@ -65,6 +62,16 @@ class ImagesPresenter @Inject constructor(
     }
 
     fun onQueryChanged(query: String) {
+        searchTagsRequests.clear()
+        loadHistoryTags(query)
+    }
+
+    private fun loadHistoryTags(query: String = "") {
+        getHistoryTags.execute(query)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ viewState.replaceHistoryTags(it) }, this::showError)
+                .bind()
+                .bindHistoryTagsRequest()
     }
 
     fun onSuggestionRemoveClick(tag: String) {
@@ -119,19 +126,17 @@ class ImagesPresenter @Inject constructor(
                 .switchMap { filter ->
                     viewState.clearImages()
                     lastLoadedPage = 0
-                    lastVisibleItemOrderValue = MAX_DATE
+                    lastItemOrderValue = MAX_DATE
                     pageRequests.map { Pair(it, filter) }
                             .distinctUntilChanged()
                             .observeOn(AndroidSchedulers.mainThread())
                             .concatMapMaybe { (page, filter) ->
-
-                                paginator.handle(
-                                        ImagePageRequest(page, lastVisibleItemOrderValue, filter))
+                                paginator.handle(ImagePageRequest(page, lastItemOrderValue, filter))
                                         .filter { /* Could drop images */ it.page > lastLoadedPage }
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .doOnSuccess { lastLoadedPage = it.page }
                                         .filter { it.images.isNotEmpty() }
-                                        .doOnSuccess { lastVisibleItemOrderValue = it.orderValue }
+                                        .doOnSuccess { lastItemOrderValue = it.orderValue }
                             }
                 }
                 .subscribe({ viewState.showImages(it.images) }, this::showError)
