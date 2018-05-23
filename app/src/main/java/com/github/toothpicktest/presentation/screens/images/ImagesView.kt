@@ -1,6 +1,7 @@
 package com.github.toothpicktest.presentation.screens.images
 
 import com.arellomobile.mvp.viewstate.strategy.AddToEndStrategy
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 import com.github.toothpicktest.domain.entity.Image
@@ -23,4 +24,7 @@ interface ImagesView : BaseView {
 
     @StateStrategyType(AddToEndSingleByTagStateStrategy::class, tag = "tagHistory")
     fun showHistoryTags(tags: List<String>)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun showError(message: String)
 }

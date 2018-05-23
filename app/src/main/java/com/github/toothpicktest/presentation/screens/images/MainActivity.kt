@@ -5,6 +5,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.view.View
+import android.widget.Toast
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.toothpicktest.R
@@ -66,7 +67,7 @@ class MainActivity : BaseActivity(), ImagesView {
     private fun initSearchView() {
         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                presenter.onHistoryTagSelected(query)
+                presenter.onQuerySubmitted(query)
                 search.clearFocus()
                 return false
             }
@@ -120,5 +121,9 @@ class MainActivity : BaseActivity(), ImagesView {
 
     override fun showImages(images: Collection<Image>) {
         adapter.addImages(images)
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

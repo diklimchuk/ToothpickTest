@@ -50,7 +50,7 @@ class ImagesPresenter @Inject constructor(
         cancelHistoryTagsRequests()
         getHistoryTags.execute()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ viewState.showHistoryTags(it) }, { /* TODO: */ })
+                .subscribe({ viewState.showHistoryTags(it) }, this::showError)
                 .bind()
                 .bindHistoryTagsRequest()
     }
@@ -70,24 +70,22 @@ class ImagesPresenter @Inject constructor(
     fun onSuggestionRemoveClick(tag: String) {
         removeHistoryTag.execute(tag)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}, {})
+                .subscribe({}, this::showError)
                 .bind()
     }
 
     fun onHistoryTagSelected(tag: String) {
         viewState.showSearchQuery(tag)
         viewState.hideHistoryTags()
-        val filter = if (tag.isBlank()) {
-            ImageFilter.recent()
-        } else {
-            ImageFilter.forTag(tag)
-        }
-        tagRequests.onNext(filter)
-        requestNextPage()
+        searchByQuery(tag)
     }
 
     fun onQuerySubmitted(query: String) {
         viewState.hideHistoryTags()
+        searchByQuery(query)
+    }
+
+    private fun searchByQuery(query: String) {
         val filter = if (query.isBlank()) {
             ImageFilter.recent()
         } else {
@@ -103,6 +101,11 @@ class ImagesPresenter @Inject constructor(
         if (margin < LOAD_THRESHOLD) {
             requestNextPage()
         }
+    }
+
+    private fun showError(t: Throwable) {
+        Timber.e(t)
+        viewState.showError(t.message ?: "Error")
     }
 
     private fun requestNextPage() {
@@ -131,7 +134,7 @@ class ImagesPresenter @Inject constructor(
                                         .doOnSuccess { lastVisibleItemOrderValue = it.orderValue }
                             }
                 }
-                .subscribe({ viewState.showImages(it.images) }, { Timber.e(it) })
+                .subscribe({ viewState.showImages(it.images) }, this::showError)
                 .bind()
     }
 }
