@@ -5,11 +5,13 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
-import com.github.toothpicktest.R.layout
+import com.github.toothpicktest.R
 import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.mvp.BaseActivity
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import kotlinx.android.synthetic.main.activity_main.images
+import kotlinx.android.synthetic.main.activity_main.search
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import toothpick.Scope
 import toothpick.Toothpick
@@ -34,9 +36,15 @@ class MainActivity : BaseActivity(), ImagesView {
         Toothpick.inject(this, scope)
         scope.installModules(SmoothieSupportActivityModule(this))
         super.onCreate(savedInstanceState)
-        setContentView(layout.activity_main)
+        setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         initRecyclerView()
+        initSearchView()
+    }
+
+    private fun initSearchView() {
+        RxSearchView.queryTextChanges(search)
+                .subscribe { presenter.onQueryChanged(it.toString()) }
     }
 
     private fun initRecyclerView() {

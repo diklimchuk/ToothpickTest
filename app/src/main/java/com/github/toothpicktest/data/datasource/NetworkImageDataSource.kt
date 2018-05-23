@@ -18,7 +18,7 @@ class NetworkImageDataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.computation())
             .map { it.photos.photo.map(JsonImage::toModel) }
-            .map { it.sortedByDescending { it.dateTaken.time } }
+            .map { it.sortedByDescending { it.updateDate.time } }
 
     override fun getImagesWithTag(
             tag: String,
@@ -28,5 +28,5 @@ class NetworkImageDataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.computation())
             .map { it.photos.photo.map(JsonImage::toModel) }
-            .map { it.sortedByDescending { it.dateTaken.time } }
+            .map { it.sortedByDescending { it.updateDate.time } }
 }

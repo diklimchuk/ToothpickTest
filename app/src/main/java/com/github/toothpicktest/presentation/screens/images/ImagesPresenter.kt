@@ -36,6 +36,10 @@ class ImagesPresenter @Inject constructor(
         requestNextPage()
     }
 
+    fun onQueryChanged(newQuery: String) {
+
+    }
+
     fun onScrolledToPosition(
             margin: Int
     ) {
@@ -57,14 +61,14 @@ class ImagesPresenter @Inject constructor(
                 .concatMapSingle { request ->
                     repo.getImages(request.page, IMAGE_BLOCK_SIZE)
                             .observeOn(Schedulers.computation())
-                            .map { it.filter { it.dateTaken < request.getMaxUploadDate() } }
+                            .map { it.filter { it.updateDate < request.getMaxUploadDate() } }
                             .map { Pair(request.page, it) }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ (page, images) ->
                     lastLoadedPage = page
-                    images.minBy { it.dateTaken }
-                            ?.dateTaken
+                    images.minBy { it.updateDate }
+                            ?.updateDate
                             ?.let { lastVisibleItemUploadDate = it }
                     viewState.showImages(images)
                 }, { Timber.e(it) })

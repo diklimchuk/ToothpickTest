@@ -38,7 +38,7 @@ dependencies {
     // Rx
     implementation libraryDependencies.rxJava
     implementation libraryDependencies.rxAndroid
-    implementation libraryDependencies.rxBinding
+    implementation libraryDependencies.rxBindingV7
     // Moxy
     implementation libraryDependencies.moxy
     implementation libraryDependencies.moxyAppcompat

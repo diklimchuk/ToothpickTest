@@ -5,5 +5,5 @@ import java.util.Date
 data class Image(
         val id: Long,
         val url: String,
-        val dateTaken: Date
+        val updateDate: Date
 )
