@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import com.github.toothpicktest.R
 import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.glide.load
 import com.github.toothpicktest.presentation.screens.images.ImagesAdapter.ImageViewHolder
 import kotlinx.android.synthetic.main.item_image.view.image
+import kotlinx.android.synthetic.main.item_image.view.tags
 
 class ImagesAdapter(
         private val activity: Activity
@@ -25,6 +27,7 @@ class ImagesAdapter(
     class ImageViewHolder(
             view: View
     ) : RecyclerView.ViewHolder(view) {
+        val tags: TextView = view.tags
         val image: ImageView = view.image
     }
 
@@ -47,6 +50,7 @@ class ImagesAdapter(
     ) {
         val image = images[position]
         holder.image.load(activity, image.url)
+        holder.tags.text = image.tags.joinToString(" ")
     }
 
     /**

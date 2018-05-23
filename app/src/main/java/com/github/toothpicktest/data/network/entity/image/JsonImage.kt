@@ -7,5 +7,6 @@ data class JsonImage(
         val server: Long,
         val title: String,
         val farm: Int,
-        val lastupdate: Long
+        val lastupdate: Long,
+        val tags: String
 )

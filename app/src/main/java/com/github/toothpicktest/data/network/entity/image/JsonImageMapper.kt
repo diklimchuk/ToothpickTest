@@ -11,5 +11,6 @@ private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
 fun JsonImage.toModel() = Image(
         id,
         "https://farm$farm.staticflickr.com/$server/${id}_${secret}_m.jpg",
-        Date(lastupdate * 1000)
+        Date(lastupdate * 1000),
+        tags.split(" ")
 )

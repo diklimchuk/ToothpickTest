@@ -5,5 +5,6 @@ import java.util.Date
 data class Image(
         val id: Long,
         val url: String,
-        val updateDate: Date
+        val updateDate: Date,
+        val tags: Collection<String>
 )
