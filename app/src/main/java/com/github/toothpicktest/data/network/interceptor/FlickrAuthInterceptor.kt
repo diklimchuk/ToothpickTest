@@ -6,7 +6,6 @@ import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -19,22 +18,22 @@ class FlickrAuthInterceptor @Inject constructor(
 
     companion object {
         private const val FLICKR_AUTH_HEADER = "FlickrAuth"
-        const val FLICKR_AUTH = "$FLICKR_AUTH_HEADER: true"
+        private const val FLICKR_AUTH_HEADER_VALUE = "true"
         private const val FLICKR_AUTH_ARG = "api_key"
+
+        /**
+         * Pass this header to a network request to trigger authorization
+         */
+        const val USE_FLICKR_AUTH = "$FLICKR_AUTH_HEADER: $FLICKR_AUTH_HEADER_VALUE"
     }
 
     override fun intercept(chain: Chain): Response {
         val originalRequest = chain.request()
 
         val authorizedRequest = if (isAuthRequired(originalRequest)) {
-            val urlWithAuth = try {
-                urlWithAuthQuery(originalRequest)
-            } catch (t: Throwable) {
-                throw IOException(t)
-            }
             originalRequest.newBuilder()
-                    .url(urlWithAuth)
-                    .removeHeader(FLICKR_AUTH)
+                    .url(urlWithAuthQuery(originalRequest))
+                    .removeHeader(USE_FLICKR_AUTH)
                     .build()
         } else {
             originalRequest
@@ -52,6 +51,6 @@ class FlickrAuthInterceptor @Inject constructor(
     private fun isAuthRequired(request: Request): Boolean {
         return request.headers()
                 .values(FLICKR_AUTH_HEADER)
-                .contains("true")
+                .contains(FLICKR_AUTH_HEADER_VALUE)
     }
 }

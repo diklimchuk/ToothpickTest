@@ -1,10 +1,9 @@
 package com.github.toothpicktest.di
 
 import com.github.toothpicktest.BuildConfig
-import com.github.toothpicktest.data.datasource.image.ImageDataSource
-import com.github.toothpicktest.data.datasource.image.NetworkImageDataSource
 import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.data.network.interceptor.FlickrAuthInterceptor
+import com.github.toothpicktest.data.network.interceptor.FlickrJsonFormatInterceptor
 import com.github.toothpicktest.di.provider.FlickrApiProvider
 import com.github.toothpicktest.di.provider.OkHttpClientProvider
 import okhttp3.Interceptor
@@ -27,6 +26,9 @@ class NetworkModule(
         bind(Interceptor::class.java)
                 .withName(FlickrApiInterceptor::class.java)
                 .to(FlickrAuthInterceptor::class.java)
+        bind(Interceptor::class.java)
+                .withName(JsonFormatInterceptor::class.java)
+                .to(FlickrJsonFormatInterceptor::class.java)
         bind(MoshiConverterFactory::class.java).toInstance(MoshiConverterFactory.create())
 
         bind(OkHttpClient::class.java).toProvider(OkHttpClientProvider::class.java)

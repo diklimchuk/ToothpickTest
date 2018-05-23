@@ -1,6 +1,7 @@
 package com.github.toothpicktest.di.provider
 
 import com.github.toothpicktest.di.FlickrApiInterceptor
+import com.github.toothpicktest.di.JsonFormatInterceptor
 import com.github.toothpicktest.di.LoggingInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -10,13 +11,15 @@ import javax.inject.Provider
 
 class OkHttpClientProvider @Inject constructor(
         @LoggingInterceptor private val loggingInterceptor: Interceptor,
-        @FlickrApiInterceptor private val flickrApiInterceptor: Interceptor
+        @FlickrApiInterceptor private val flickrApiInterceptor: Interceptor,
+        @JsonFormatInterceptor private val flickrJsonFormatInterceptor: Interceptor
 ) : Provider<OkHttpClient> {
     override fun get(): OkHttpClient = with(OkHttpClient.Builder()) {
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
         addNetworkInterceptor(flickrApiInterceptor)
+        addNetworkInterceptor(flickrJsonFormatInterceptor)
         addNetworkInterceptor(loggingInterceptor)
         build()
     }
