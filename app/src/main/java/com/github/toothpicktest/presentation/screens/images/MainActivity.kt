@@ -39,12 +39,17 @@ class MainActivity : BaseActivity(), ImagesView {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         initRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         initSearchView()
     }
 
     private fun initSearchView() {
         RxSearchView.queryTextChanges(search)
                 .subscribe { presenter.onQueryChanged(it.toString()) }
+                .bindActive()
     }
 
     private fun initRecyclerView() {

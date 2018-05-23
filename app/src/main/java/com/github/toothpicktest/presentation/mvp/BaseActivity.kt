@@ -8,5 +8,10 @@ abstract class BaseActivity : MvpAppCompatActivity() {
 
     private val disposables = CompositeDisposable()
 
-    fun Disposable.bind() = disposables.add(this).let { this }
+    fun Disposable.bindActive() = disposables.add(this).let { this }
+
+    override fun onPause() {
+        super.onPause()
+        disposables.clear()
+    }
 }

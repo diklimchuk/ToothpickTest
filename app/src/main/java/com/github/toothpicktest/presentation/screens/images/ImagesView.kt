@@ -11,6 +11,6 @@ interface ImagesView : BaseView {
     @StateStrategyType(AddToEndStrategy::class)
     fun showImages(images: Collection<Image>)
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
+    @StateStrategyType(AddToEndStrategy::class)
     fun clearImages()
 }
