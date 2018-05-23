@@ -13,20 +13,22 @@ interface FlickrApi {
     @Headers(FlickrAuthInterceptor.FLICKR_AUTH)
     fun searchImages(
             @Query("tags") tags: String,
+            @Query("per_page") pageSize: Int = 100,
             @Query("method") method: String = "flickr.photos.search",
             @Query("extras") extras: String = "date_upload",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
-            @Query("page") page: String = "1"
+            @Query("page") page: Int = 1
     ): Single<JsonImagesResponse>
 
     @GET("rest")
     @Headers(FlickrAuthInterceptor.FLICKR_AUTH)
     fun recentImages(
+            @Query("per_page") pageSize: Int = 100,
             @Query("method") method: String = "flickr.photos.getRecent",
             @Query("extras") extras: String = "date_upload",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
-            @Query("page") page: String = "1"
+            @Query("page") page: Int = 1
     ): Single<JsonImagesResponse>
 }

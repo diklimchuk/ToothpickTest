@@ -6,18 +6,14 @@ import com.github.toothpicktest.data.network.entity.image.JsonImage
 import com.github.toothpicktest.data.network.entity.image.toModel
 import com.github.toothpicktest.data.network.response.JsonImagesResponse
 import com.github.toothpicktest.data.network.response.JsonImagesResponseContent
-import com.github.toothpicktest.data.repo.ImageRepo
 import io.reactivex.Single
-import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnit
 import java.util.Date
 import java.util.Random
-import org.junit.Assert.*
 
 class NetworkDataSourcePaginationTest {
 
@@ -36,31 +32,47 @@ class NetworkDataSourcePaginationTest {
         return bytes.contentToString()
     }
 
-    private fun getRandomImage(): JsonImage = JsonImage(
+    private fun getRandomImage(
+            timestamp: Long = Date().time
+    ): JsonImage = JsonImage(
             random.nextLong(),
             random.nextString(10),
             random.nextString(10),
             random.nextLong(),
             random.nextString(11),
             random.nextInt(),
-            Date().time
-    )
-
-    private fun getRandomApiResponse(
-            page: Int,
-            quantity: Int
-    ): JsonImagesResponse = JsonImagesResponse(
-            JsonImagesResponseContent(page, 100, quantity, quantity * 100, (0..10).map{ getRandomImage() }),
-            "ok"
+            timestamp
     )
 
     @Test
     fun firstPageIsLoadedAsIs() {
-        val response = getRandomApiResponse(1, 10)
-        `when`(api.recentImages()).thenReturn(Single.just(response))
+        val jsonImages = listOf(getRandomImage(), getRandomImage())
+        val response = JsonImagesResponse(
+                JsonImagesResponseContent(1, 100, 2, 200, jsonImages),
+                "ok"
+        )
+        `when`(api.recentImages(pageSize = 2)).thenReturn(Single.just(response))
+
         val dataSource = NetworkImageDataSource(api)
-        dataSource.getImages(Date(), 10)
+        val images = jsonImages.map(JsonImage::toModel)
+        dataSource.getImages(1, 2)
                 .test()
-                .assertResult(response.photos.photo.map(JsonImage::toModel))
+                .assertResult(images)
+    }
+
+    @Test
+    fun returnAllIfLastPageIsNotFilled() {
+        val jsonImages = listOf(getRandomImage(), getRandomImage(), getRandomImage())
+        val response = JsonImagesResponse(
+                JsonImagesResponseContent(3, 3, 10, 23, jsonImages),
+                "ok"
+        )
+        `when`(api.recentImages(pageSize = 10)).thenReturn(Single.just(response))
+
+        val dataSource = NetworkImageDataSource(api)
+        val images = jsonImages.map(JsonImage::toModel)
+        dataSource.getImages(3, 10)
+                .test()
+                .assertResult(images)
     }
 }

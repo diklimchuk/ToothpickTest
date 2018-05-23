@@ -6,13 +6,13 @@ import java.util.Date
 
 interface ImageDataSource {
     fun getImages(
-            afterDate: Date,
+            page: Int,
             quantity: Int
     ): Single<List<Image>>
 
     fun getImagesWithTag(
             tag: String,
-            afterDate: Date,
+            page: Int,
             quantity: Int
     ): Single<List<Image>>
 }
