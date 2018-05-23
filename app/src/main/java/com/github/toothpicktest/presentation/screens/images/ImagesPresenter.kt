@@ -2,6 +2,7 @@ package com.github.toothpicktest.presentation.screens.images
 
 import com.arellomobile.mvp.InjectViewState
 import com.github.toothpicktest.domain.usecase.GetHistoryTagsUseCase
+import com.github.toothpicktest.domain.usecase.RemoveHistoryTagUseCase
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @ImagesScope
 class ImagesPresenter @Inject constructor(
         private val paginator: ImagePaginator,
-        private val getHistoryTags: GetHistoryTagsUseCase
+        private val getHistoryTags: GetHistoryTagsUseCase,
+        private val removeHistoryTag: RemoveHistoryTagUseCase
 ) : BasePresenter<ImagesView>() {
 
     companion object {
@@ -41,6 +43,7 @@ class ImagesPresenter @Inject constructor(
         observePageRequests()
         tagRequests.onNext(ImageFilter.recent())
         requestNextPage()
+        viewState.hideHistoryTags()
     }
 
     fun onSearchFocused() {
@@ -61,11 +64,34 @@ class ImagesPresenter @Inject constructor(
         searchTagsRequests.clear()
     }
 
-    fun onQueryChanged(newQuery: String) {
-        val filter = if (newQuery.isBlank()) {
+    fun onQueryChanged(query: String) {
+    }
+
+    fun onSuggestionRemoveClick(tag: String) {
+        removeHistoryTag.execute(tag)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({}, {})
+                .bind()
+    }
+
+    fun onHistoryTagSelected(tag: String) {
+        viewState.showSearchQuery(tag)
+        viewState.hideHistoryTags()
+        val filter = if (tag.isBlank()) {
             ImageFilter.recent()
         } else {
-            ImageFilter.forTag(newQuery)
+            ImageFilter.forTag(tag)
+        }
+        tagRequests.onNext(filter)
+        requestNextPage()
+    }
+
+    fun onQuerySubmitted(query: String) {
+        viewState.hideHistoryTags()
+        val filter = if (query.isBlank()) {
+            ImageFilter.recent()
+        } else {
+            ImageFilter.forTag(query)
         }
         tagRequests.onNext(filter)
         requestNextPage()

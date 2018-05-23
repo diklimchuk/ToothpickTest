@@ -15,4 +15,6 @@ class MemoryTagHistoryDataSource : TagHistoryDataSource {
     override fun addTag(tag: String): Completable = Completable.fromRunnable { tags.add(tag) }
 
     override fun getAll(): Single<List<String>> = Single.fromCallable { tags.toList() }
+
+    override fun removeTag(tag: String): Completable = Completable.fromRunnable { tags.remove(tag) }
 }

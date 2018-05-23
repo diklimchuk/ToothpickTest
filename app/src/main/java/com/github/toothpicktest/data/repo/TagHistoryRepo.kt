@@ -13,4 +13,6 @@ class TagHistoryRepo @Inject constructor(
     override fun addHistoryTag(tag: String): Completable = memory.addTag(tag)
 
     override fun getHistoryTags(): Single<List<String>> = memory.getAll()
+
+    override fun removeHistoryTag(tag: String): Completable = memory.removeTag(tag)
 }

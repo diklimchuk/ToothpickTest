@@ -5,6 +5,6 @@ import io.reactivex.Single
 
 interface TagHistoryDataSource {
     fun addTag(tag: String): Completable
-
     fun getAll(): Single<List<String>>
+    fun removeTag(tag: String): Completable
 }

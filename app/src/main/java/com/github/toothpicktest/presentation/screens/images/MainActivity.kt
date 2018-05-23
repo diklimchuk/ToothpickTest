@@ -3,17 +3,18 @@ package com.github.toothpicktest.presentation.screens.images
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
+import android.view.View
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.toothpicktest.R
 import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.mvp.BaseActivity
-import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import kotlinx.android.synthetic.main.activity_main.images
 import kotlinx.android.synthetic.main.activity_main.search
+import kotlinx.android.synthetic.main.activity_main.suggestions
 import kotlinx.android.synthetic.main.activity_main.toolbar
-import timber.log.Timber
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieSupportActivityModule
@@ -32,6 +33,7 @@ class MainActivity : BaseActivity(), ImagesView {
     fun providePresenter(): ImagesPresenter = scope.getInstance(ImagesPresenter::class.java)
 
     private val adapter = ImagesAdapter(this)
+    private val suggestionsAdapter = SuggestionsAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Toothpick.inject(this, scope)
@@ -39,15 +41,41 @@ class MainActivity : BaseActivity(), ImagesView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        initRecyclerView()
+        initImagesRecycler()
     }
 
     override fun onResume() {
         super.onResume()
         initSearchView()
+        initSuggestionsRecycler()
+    }
+
+    private fun initSuggestionsRecycler() {
+        suggestionsAdapter.getSuggestionClicks()
+                .subscribe {
+                    search.clearFocus()
+                    presenter.onHistoryTagSelected(it)
+                }
+                .bindActive()
+        suggestionsAdapter.getRemoveSuggestionClicks()
+                .subscribe { presenter.onSuggestionRemoveClick(it) }
+                .bindActive()
+        suggestions.adapter = suggestionsAdapter
     }
 
     private fun initSearchView() {
+        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                presenter.onHistoryTagSelected(query)
+                search.clearFocus()
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                presenter.onQueryChanged(newText)
+                return true
+            }
+        })
         search.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 presenter.onSearchFocused()
@@ -55,13 +83,9 @@ class MainActivity : BaseActivity(), ImagesView {
                 presenter.onSearchLostFocus()
             }
         }
-        RxSearchView.queryTextChanges(search)
-                .skipInitialValue()
-                .subscribe { presenter.onQueryChanged(it.toString()) }
-                .bindActive()
     }
 
-    private fun initRecyclerView() {
+    private fun initImagesRecycler() {
         images.adapter = adapter
         images.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(
@@ -78,11 +102,16 @@ class MainActivity : BaseActivity(), ImagesView {
     }
 
     override fun hideHistoryTags() {
+        suggestions.visibility = View.GONE
+    }
 
+    override fun showSearchQuery(tag: String) {
+        search.setQuery(tag, false)
     }
 
     override fun showHistoryTags(tags: List<String>) {
-        Timber.e("TAGS + $tags")
+        suggestions.visibility = View.VISIBLE
+        suggestionsAdapter.replaceItems(tags)
     }
 
     override fun clearImages() {
