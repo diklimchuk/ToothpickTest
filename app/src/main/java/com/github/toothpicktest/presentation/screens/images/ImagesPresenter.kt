@@ -1,8 +1,9 @@
 package com.github.toothpicktest.presentation.screens.images
 
 import com.arellomobile.mvp.InjectViewState
-import com.github.toothpicktest.domain.repo.IImageRepo
 import com.github.toothpicktest.presentation.mvp.BasePresenter
+import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
+import com.github.toothpicktest.presentation.screens.images.pagination.ImagePaginator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -14,11 +15,10 @@ import javax.inject.Inject
 @InjectViewState
 @ImagesScope
 class ImagesPresenter @Inject constructor(
-        private val repo: IImageRepo
+        private val paginator: ImagePaginator
 ) : BasePresenter<ImagesView>() {
 
     companion object {
-        private const val IMAGE_BLOCK_SIZE = 30
 
         private const val LOAD_THRESHOLD = 20
 
@@ -27,8 +27,9 @@ class ImagesPresenter @Inject constructor(
 
     private var lastLoadedPage = 0
     private var lastVisibleItemUploadDate = MAX_DATE
+    private var currentTag: String? = null
 
-    private val pageRequests = PublishSubject.create<PageRequest>()
+    private val pageRequests = PublishSubject.create<ImagePageRequest>()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -37,20 +38,38 @@ class ImagesPresenter @Inject constructor(
     }
 
     fun onQueryChanged(newQuery: String) {
-
+        viewState.clearImages()
+        currentTag = newQuery
+        lastLoadedPage = 0
+        lastVisibleItemUploadDate = MAX_DATE
+        requestNextPageWithTag()
     }
 
     fun onScrolledToPosition(
             margin: Int
     ) {
         if (margin < LOAD_THRESHOLD) {
-            requestNextPage()
+            if (currentTag == null) {
+                requestNextPage()
+            } else {
+                requestNextPageWithTag()
+            }
         }
+    }
+
+    /**
+     * Ignores request if [currentTag] is null.
+     */
+    private fun requestNextPageWithTag() {
+        if (currentTag == null) return
+        val nextPage = lastLoadedPage + 1
+        val pageRequest = ImagePageRequest(nextPage, lastVisibleItemUploadDate, currentTag!!)
+        pageRequests.onNext(pageRequest)
     }
 
     private fun requestNextPage() {
         val nextPage = lastLoadedPage + 1
-        val pageRequest = createPageRequest(nextPage, lastVisibleItemUploadDate)
+        val pageRequest = ImagePageRequest(nextPage, lastVisibleItemUploadDate)
         pageRequests.onNext(pageRequest)
     }
 
@@ -58,26 +77,12 @@ class ImagesPresenter @Inject constructor(
         pageRequests
                 .observeOn(Schedulers.computation())
                 .distinctUntilChanged()
-                .concatMapSingle { request ->
-                    repo.getImages(request.page, IMAGE_BLOCK_SIZE)
-                            .observeOn(Schedulers.computation())
-                            .map { it.filter { it.updateDate < request.getMaxUploadDate() } }
-                            .map { Pair(request.page, it) }
-                }
+                .concatMapSingle(paginator::handle)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ (page, images) ->
-                    lastLoadedPage = page
-                    images.minBy { it.updateDate }
-                            ?.updateDate
-                            ?.let { lastVisibleItemUploadDate = it }
-                    viewState.showImages(images)
-                }, { Timber.e(it) })
+                .filter { /* Could drop images */ it.page > lastLoadedPage }
+                .doOnNext { lastLoadedPage = it.page }
+                .filter { it.images.isNotEmpty() }
+                .doOnNext { if (it.hasMinDate) lastVisibleItemUploadDate = it.minDate }
+                .subscribe({ viewState.showImages(it.images) }, { Timber.e(it) })
     }
-
-    private fun PageRequest.getMaxUploadDate() = Date(orderValueLt)
-
-    private fun createPageRequest(
-            page: Int,
-            maxUploadDate: Date
-    ) = PageRequest(page, maxUploadDate.time)
 }

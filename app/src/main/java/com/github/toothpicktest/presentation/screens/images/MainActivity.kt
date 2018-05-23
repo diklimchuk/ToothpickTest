@@ -63,6 +63,10 @@ class MainActivity : BaseActivity(), ImagesView {
         })
     }
 
+    override fun clearImages() {
+        adapter.clear()
+    }
+
     override fun showImages(images: Collection<Image>) {
         adapter.addImages(images)
     }

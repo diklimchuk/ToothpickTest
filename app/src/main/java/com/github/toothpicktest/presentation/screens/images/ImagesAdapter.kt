@@ -54,6 +54,12 @@ class ImagesAdapter(
      */
     fun getImage(position: Int) = images[position]
 
+    fun clear() {
+        val previousSize = images.size
+        images.clear()
+        notifyItemRangeRemoved(0, previousSize)
+    }
+
     fun addImages(images: Collection<Image>) {
         val previousSize = this.images.size
         this.images.addAll(images)
