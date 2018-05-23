@@ -37,7 +37,6 @@ class ImagesPresenter @Inject constructor(
     }
 
     fun onQueryChanged(newQuery: String) {
-        viewState.clearImages()
         tagRequests.onNext(newQuery)
         requestNextPage()
     }
@@ -57,7 +56,9 @@ class ImagesPresenter @Inject constructor(
 
     private fun observePageRequests() {
         tagRequests
+                .distinctUntilChanged()
                 .switchMap { tag ->
+                    viewState.clearImages()
                     lastLoadedPage = 0
                     lastVisibleItemOrderValue = MAX_DATE
                     pageRequests.map { Pair(it, tag) }
