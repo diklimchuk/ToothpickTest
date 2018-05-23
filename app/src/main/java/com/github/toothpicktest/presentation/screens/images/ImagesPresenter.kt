@@ -79,5 +79,6 @@ class ImagesPresenter @Inject constructor(
                             }
                 }
                 .subscribe({ viewState.showImages(it.images) }, { Timber.e(it) })
+                .bind()
     }
 }
