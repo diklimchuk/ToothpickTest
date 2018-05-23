@@ -49,8 +49,13 @@ class ImagesAdapter(
         holder.image.load(activity, image.url)
     }
 
+    /**
+     * @param position Adapter position of the item to return
+     */
+    fun getImage(position: Int) = images[position]
+
     fun addImages(images: Collection<Image>) {
-        val previousSize = images.size
+        val previousSize = this.images.size
         this.images.addAll(images)
         notifyItemRangeInserted(previousSize, images.size)
     }

@@ -1,6 +1,8 @@
 package com.github.toothpicktest.presentation.screens.images
 
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.toothpicktest.R.layout
@@ -39,6 +41,18 @@ class MainActivity : BaseActivity(), ImagesView {
 
     private fun initRecyclerView() {
         images.adapter = adapter
+        images.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int
+            ) {
+                val lastVisiblePosition = (recyclerView.layoutManager as GridLayoutManager)
+                        .findLastVisibleItemPosition()
+                val margin = adapter.itemCount - lastVisiblePosition
+                presenter.onScrolledToPosition(margin)
+            }
+        })
     }
 
     override fun showImages(images: Collection<Image>) {

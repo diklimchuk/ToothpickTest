@@ -15,7 +15,8 @@ interface FlickrApi {
             @Query("tags") tags: String,
             @Query("per_page") pageSize: Int = 100,
             @Query("method") method: String = "flickr.photos.search",
-            @Query("extras") extras: String = "date_upload",
+            @Query("sort") order: String = "date-taken-desc",
+            @Query("extras") extras: String = "last_update",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
             @Query("page") page: Int = 1
@@ -26,7 +27,7 @@ interface FlickrApi {
     fun recentImages(
             @Query("per_page") pageSize: Int = 100,
             @Query("method") method: String = "flickr.photos.getRecent",
-            @Query("extras") extras: String = "date_upload",
+            @Query("extras") extras: String = "last_update",
             @Query("format") format: String = "json",
             @Query("nojsoncallback") noJsonCallback: Int = 1,
             @Query("page") page: Int = 1

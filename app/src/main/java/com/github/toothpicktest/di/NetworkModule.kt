@@ -1,6 +1,8 @@
 package com.github.toothpicktest.di
 
 import com.github.toothpicktest.BuildConfig
+import com.github.toothpicktest.data.datasource.ImageDataSource
+import com.github.toothpicktest.data.datasource.NetworkImageDataSource
 import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.data.network.interceptor.FlickrAuthInterceptor
 import com.github.toothpicktest.di.provider.FlickrApiProvider
@@ -29,6 +31,7 @@ class NetworkModule(
 
         bind(OkHttpClient::class.java).toProvider(OkHttpClientProvider::class.java)
         bind(FlickrApi::class.java).toProvider(FlickrApiProvider::class.java)
+        bind(ImageDataSource::class.java).to(NetworkImageDataSource::class.java)
     }
 
     private fun createHttpLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().apply {

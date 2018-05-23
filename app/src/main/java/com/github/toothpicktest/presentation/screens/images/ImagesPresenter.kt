@@ -18,44 +18,56 @@ class ImagesPresenter @Inject constructor(
 ) : BasePresenter<ImagesView>() {
 
     companion object {
-        private const val IMAGE_BLOCK_SIZE = 100
+        private const val IMAGE_BLOCK_SIZE = 30
 
         private const val LOAD_THRESHOLD = 20
 
         private val MAX_DATE = Date(Long.MAX_VALUE)
     }
 
-    private var lastRequestedPage = 0
+    private var lastLoadedPage = 0
+    private var lastVisibleItemUploadDate = MAX_DATE
 
     private val pageRequests = PublishSubject.create<PageRequest>()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         observePageRequests()
-        pageRequests.onNext(createPageRequest(1, MAX_DATE))
+        requestNextPage()
     }
 
-    fun onScolledToPosition(
-            itemUploadDate: Date,
+    fun onScrolledToPosition(
             margin: Int
     ) {
         if (margin < LOAD_THRESHOLD) {
-            val nextPage = lastRequestedPage
-            pageRequests.onNext(createPageRequest(lastRequestedPage, itemUploadDate))
-            lastRequestedPage = nextPage
+            requestNextPage()
         }
+    }
+
+    private fun requestNextPage() {
+        val nextPage = lastLoadedPage + 1
+        val pageRequest = createPageRequest(nextPage, lastVisibleItemUploadDate)
+        pageRequests.onNext(pageRequest)
     }
 
     private fun observePageRequests() {
         pageRequests
+                .observeOn(Schedulers.computation())
+                .distinctUntilChanged()
                 .concatMapSingle { request ->
                     repo.getImages(request.page, IMAGE_BLOCK_SIZE)
-                            .map { it.filter { it.uploadDate < request.getMaxUploadDate() } }
+                            .observeOn(Schedulers.computation())
+                            .map { it.filter { it.dateTaken < request.getMaxUploadDate() } }
+                            .map { Pair(request.page, it) }
                 }
-                .filter { it.isNotEmpty() }
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ viewState.showImages(it) }, { Timber.e(it) })
+                .subscribe({ (page, images) ->
+                    lastLoadedPage = page
+                    images.minBy { it.dateTaken }
+                            ?.dateTaken
+                            ?.let { lastVisibleItemUploadDate = it }
+                    viewState.showImages(images)
+                }, { Timber.e(it) })
     }
 
     private fun PageRequest.getMaxUploadDate() = Date(orderValueLt)
