@@ -5,10 +5,8 @@ import com.github.toothpicktest.presentation.mvp.BasePresenter
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePaginator
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
-import java.util.Date
 import javax.inject.Inject
 
 
@@ -22,67 +20,63 @@ class ImagesPresenter @Inject constructor(
 
         private const val LOAD_THRESHOLD = 20
 
-        private val MAX_DATE = Date(Long.MAX_VALUE)
+        private const val MAX_DATE = Long.MAX_VALUE
     }
 
     private var lastLoadedPage = 0
-    private var lastVisibleItemUploadDate = MAX_DATE
-    private var currentTag: String? = null
+    private var lastVisibleItemOrderValue = MAX_DATE
 
-    private val pageRequests = PublishSubject.create<ImagePageRequest>()
+    private val tagRequests = PublishSubject.create<String>()
+    private val pageRequests = PublishSubject.create<Int>()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         observePageRequests()
+        tagRequests.onNext("")
         requestNextPage()
     }
 
     fun onQueryChanged(newQuery: String) {
         viewState.clearImages()
-        currentTag = newQuery
-        lastLoadedPage = 0
-        lastVisibleItemUploadDate = MAX_DATE
-        requestNextPageWithTag()
+        tagRequests.onNext(newQuery)
+        requestNextPage()
     }
 
     fun onScrolledToPosition(
             margin: Int
     ) {
         if (margin < LOAD_THRESHOLD) {
-            if (currentTag == null) {
-                requestNextPage()
-            } else {
-                requestNextPageWithTag()
-            }
+            requestNextPage()
         }
-    }
-
-    /**
-     * Ignores request if [currentTag] is null.
-     */
-    private fun requestNextPageWithTag() {
-        if (currentTag == null) return
-        val nextPage = lastLoadedPage + 1
-        val pageRequest = ImagePageRequest(nextPage, lastVisibleItemUploadDate, currentTag!!)
-        pageRequests.onNext(pageRequest)
     }
 
     private fun requestNextPage() {
         val nextPage = lastLoadedPage + 1
-        val pageRequest = ImagePageRequest(nextPage, lastVisibleItemUploadDate)
-        pageRequests.onNext(pageRequest)
+        pageRequests.onNext(nextPage)
     }
 
     private fun observePageRequests() {
-        pageRequests
-                .observeOn(Schedulers.computation())
-                .distinctUntilChanged()
-                .concatMapSingle(paginator::handle)
-                .observeOn(AndroidSchedulers.mainThread())
-                .filter { /* Could drop images */ it.page > lastLoadedPage }
-                .doOnNext { lastLoadedPage = it.page }
-                .filter { it.images.isNotEmpty() }
-                .doOnNext { if (it.hasMinDate) lastVisibleItemUploadDate = it.minDate }
+        tagRequests
+                .switchMap { tag ->
+                    lastLoadedPage = 0
+                    lastVisibleItemOrderValue = MAX_DATE
+                    pageRequests.map { Pair(it, tag) }
+                            .distinctUntilChanged()
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .concatMapMaybe { (page, tag) ->
+                                val request = if (tag.isBlank()) {
+                                    ImagePageRequest(page, lastVisibleItemOrderValue)
+                                } else {
+                                    ImagePageRequest(page, lastVisibleItemOrderValue, tag)
+                                }
+                                paginator.handle(request)
+                                        .filter { /* Could drop images */ it.page > lastLoadedPage }
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .doOnSuccess { lastLoadedPage = it.page }
+                                        .filter { it.images.isNotEmpty() }
+                                        .doOnSuccess { lastVisibleItemOrderValue = it.orderValue }
+                            }
+                }
                 .subscribe({ viewState.showImages(it.images) }, { Timber.e(it) })
     }
 }

@@ -1,14 +1,13 @@
 package com.github.toothpicktest.presentation.screens.images.pagination
 
-import java.util.Date
-
 /**
  * @param page Number of page to load
- * @param maxUploadDate All images should have upload date lte than this value.
+ * @param orderValueLt Assuming images are ordered by some value, all returned values should be
+ * less than this.
  */
 data class ImagePageRequest(
         val page: Int,
-        val maxUploadDate: Date,
+        val orderValueLt: Long,
         val tag: String = ""
 ) {
     val hasTag = tag.isNotBlank()

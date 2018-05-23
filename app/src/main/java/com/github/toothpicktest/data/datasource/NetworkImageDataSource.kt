@@ -28,5 +28,5 @@ class NetworkImageDataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.computation())
             .map { it.photos.photo.map(JsonImage::toModel) }
-            .map { it.sortedByDescending { it.updateDate.time } }
+            .map { it.sortedByDescending { it.uploadDate.time } }
 }

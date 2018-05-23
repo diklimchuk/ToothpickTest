@@ -5,12 +5,6 @@ import java.util.Date
 
 data class ImagePageResult(
         val page: Int,
-        val images: List<Image>
-) {
-    companion object {
-        private val DEFAULT_DATE = Date(0)
-    }
-
-    val minDate = images.minBy { it.updateDate }?.updateDate ?: DEFAULT_DATE
-    val hasMinDate = minDate != DEFAULT_DATE
-}
+        val images: List<Image>,
+        val orderValue: Long
+)
