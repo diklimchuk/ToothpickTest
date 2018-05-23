@@ -49,9 +49,9 @@ class ImagesAdapter(
         holder.image.load(activity, image.url)
     }
 
-    fun replaceImages(images: Collection<Image>) {
-        this.images.clear()
+    fun addImages(images: Collection<Image>) {
+        val previousSize = images.size
         this.images.addAll(images)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(previousSize, images.size)
     }
 }

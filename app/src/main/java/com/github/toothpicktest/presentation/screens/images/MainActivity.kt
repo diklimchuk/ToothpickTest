@@ -42,6 +42,6 @@ class MainActivity : BaseActivity(), ImagesView {
     }
 
     override fun showImages(images: Collection<Image>) {
-        adapter.replaceImages(images)
+        adapter.addImages(images)
     }
 }
