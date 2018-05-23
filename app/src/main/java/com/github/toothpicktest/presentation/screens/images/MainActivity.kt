@@ -77,6 +77,10 @@ class MainActivity : BaseActivity(), ImagesView {
                 return true
             }
         })
+        search.setOnCloseListener {
+            presenter.onSearchCloseClick()
+            false
+        }
         search.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 presenter.onSearchFocused()

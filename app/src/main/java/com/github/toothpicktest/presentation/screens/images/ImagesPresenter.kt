@@ -5,6 +5,7 @@ import com.github.toothpicktest.domain.usecase.GetHistoryTagsUseCase
 import com.github.toothpicktest.domain.usecase.RemoveHistoryTagUseCase
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
+import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter.Companion
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePaginator
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,6 +45,12 @@ class ImagesPresenter @Inject constructor(
         tagRequests.onNext(ImageFilter.recent())
         requestNextPage()
         viewState.hideHistoryTags()
+    }
+
+    fun onSearchCloseClick() {
+        viewState.hideHistoryTags()
+        cancelHistoryTagsRequests()
+        tagRequests.onNext(ImageFilter.recent())
     }
 
     fun onSearchFocused() {
