@@ -12,12 +12,6 @@ interface ImageDataSource {
             quantity: Int
     ): Single<List<Image>>
 
-    fun hasImages(
-            filter: ImageFilter,
-            page: Int,
-            quantity: Int
-    ): Completable
-
     fun saveImages(
             filter: ImageFilter,
             page: Int,

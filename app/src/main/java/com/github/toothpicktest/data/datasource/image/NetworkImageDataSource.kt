@@ -48,12 +48,6 @@ class NetworkImageDataSource @Inject constructor(
             .map { it.photos.photo.map(JsonImage::toModel) }
             .map { it.sortedByDescending { it.uploadDate.time } }
 
-    override fun hasImages(
-            filter: ImageFilter,
-            page: Int,
-            quantity: Int
-    ): Completable = Completable.complete()
-
     override fun saveImages(
             filter: ImageFilter,
             page: Int,

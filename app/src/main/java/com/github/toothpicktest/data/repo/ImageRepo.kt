@@ -18,7 +18,10 @@ class ImageRepo @Inject constructor(
             filter: ImageFilter,
             page: Int,
             quantity: Int
-    ): Single<List<Image>> {
-        return network.getImages(filter, page, quantity)
-    }
+    ): Single<List<Image>> = memory.getImages(filter, page, quantity)
+            .onErrorResumeNext(network.getImages(filter, page, quantity)
+                    .flatMap {
+                        memory.saveImages(filter, page, quantity, it)
+                                .andThen(Single.just(it))
+                    })
 }

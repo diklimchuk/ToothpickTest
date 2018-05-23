@@ -5,6 +5,7 @@ import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class MemoryImageDataSource @Inject constructor() : ImageDataSource {
@@ -26,25 +27,17 @@ class MemoryImageDataSource @Inject constructor() : ImageDataSource {
             page: Int,
             pageSize: Int,
             images: List<Image>
-    ): Completable = Completable.fromRunnable {
-        cache.put(Key(filter, page, pageSize), images)
-    }
-
-    override fun hasImages(
-            filter: ImageFilter,
-            page: Int,
-            quantity: Int
-    ): Completable = Completable.fromRunnable {
-        if (cache.get(Key(filter, page, quantity)) == null) {
-            throw Exception("No cached value")
-        }
-    }
+    ): Completable = Completable
+            .fromRunnable { cache.put(Key(filter, page, pageSize), images) }
+            .subscribeOn(Schedulers.io())
 
     override fun getImages(
             filter: ImageFilter,
             page: Int,
             quantity: Int
-    ): Single<List<Image>> = Single.fromCallable {
-        cache.get(Key(filter, page, quantity)) ?: throw Exception("No cached value")
-    }
+    ): Single<List<Image>> = Single
+            .fromCallable {
+                cache.get(Key(filter, page, quantity)) ?: throw Exception("No cached value")
+            }
+            .subscribeOn(Schedulers.io())
 }
