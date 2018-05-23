@@ -41,9 +41,8 @@ class ImagesPresenter @Inject constructor(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         observePageRequests()
-        tagRequests.onNext(ImageFilter.recent())
-        requestNextPage()
         viewState.hideHistoryTags()
+        searchRecent()
     }
 
     /*
@@ -73,7 +72,11 @@ class ImagesPresenter @Inject constructor(
 
     fun onQuerySubmitted(query: String) {
         viewState.hideHistoryTags()
-        searchByQuery(query)
+        if (query.isBlank()) {
+            searchRecent()
+        } else {
+            searchByQuery(query)
+        }
     }
 
     fun onSearchSuggestionRemoveClick(tag: String) {
@@ -101,13 +104,13 @@ class ImagesPresenter @Inject constructor(
         searchTagsRequests.clear()
     }
 
-    private fun searchByQuery(query: String) {
-        val filter = if (query.isBlank()) {
-            ImageFilter.recent()
-        } else {
-            ImageFilter.forTag(query)
-        }
-        tagRequests.onNext(filter)
+    private fun searchRecent() {
+        tagRequests.onNext(ImageFilter.recent())
+        requestNextPage()
+    }
+
+    private fun searchByQuery(tag: String) {
+        tagRequests.onNext(ImageFilter.forTag(tag))
         requestNextPage()
     }
 
@@ -121,11 +124,6 @@ class ImagesPresenter @Inject constructor(
         if (margin < LOAD_THRESHOLD) {
             requestNextPage()
         }
-    }
-
-    private fun showError(t: Throwable) {
-        Timber.e(t)
-        viewState.showError(t.message ?: "Error")
     }
 
     private fun requestNextPage() {
@@ -154,5 +152,14 @@ class ImagesPresenter @Inject constructor(
                 }
                 .subscribe({ viewState.showImages(it.images) }, this::showError)
                 .bind()
+    }
+
+    /*
+     * Other
+     */
+
+    private fun showError(t: Throwable) {
+        Timber.e(t)
+        viewState.showError(t.message ?: "Error")
     }
 }
