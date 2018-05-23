@@ -13,6 +13,7 @@ import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import kotlinx.android.synthetic.main.activity_main.images
 import kotlinx.android.synthetic.main.activity_main.search
 import kotlinx.android.synthetic.main.activity_main.toolbar
+import timber.log.Timber
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieSupportActivityModule
@@ -47,7 +48,15 @@ class MainActivity : BaseActivity(), ImagesView {
     }
 
     private fun initSearchView() {
+        search.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                presenter.onSearchFocused()
+            } else {
+                presenter.onSearchLostFocus()
+            }
+        }
         RxSearchView.queryTextChanges(search)
+                .skipInitialValue()
                 .subscribe { presenter.onQueryChanged(it.toString()) }
                 .bindActive()
     }
@@ -66,6 +75,14 @@ class MainActivity : BaseActivity(), ImagesView {
                 presenter.onScrolledToPosition(margin)
             }
         })
+    }
+
+    override fun hideHistoryTags() {
+
+    }
+
+    override fun showHistoryTags(tags: List<String>) {
+        Timber.e("TAGS + $tags")
     }
 
     override fun clearImages() {

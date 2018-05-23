@@ -3,6 +3,7 @@ package com.github.toothpicktest.presentation
 import android.app.Application
 import android.content.Context
 import com.github.toothpicktest.BuildConfig
+import com.github.toothpicktest.di.DataSourceModule
 import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.di.NetworkModule
 import com.github.toothpicktest.di.RepoModule
@@ -38,7 +39,8 @@ class App : Application() {
         appScope.installModules(
                 appModule,
                 NetworkModule(BuildConfig.API_BASE_URL, BuildConfig.FLICKR_API_KEY),
-                RepoModule()
+                RepoModule(),
+                DataSourceModule()
         )
     }
 

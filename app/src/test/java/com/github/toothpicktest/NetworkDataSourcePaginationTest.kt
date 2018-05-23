@@ -1,6 +1,6 @@
 package com.github.toothpicktest
 
-import com.github.toothpicktest.data.datasource.NetworkImageDataSource
+import com.github.toothpicktest.data.datasource.image.NetworkImageDataSource
 import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.data.network.entity.image.JsonImage
 import com.github.toothpicktest.data.network.entity.image.toModel

@@ -1,13 +1,13 @@
 package com.github.toothpicktest.presentation.screens.images.pagination
 
 import com.github.toothpicktest.domain.entity.Image
-import com.github.toothpicktest.domain.repo.IImageRepo
+import com.github.toothpicktest.domain.usecase.GetImagesUseCase
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ImagePaginator @Inject constructor(
-        private val repo: IImageRepo
+        private val getImages: GetImagesUseCase
 ) {
 
     companion object {
@@ -38,6 +38,6 @@ class ImagePaginator @Inject constructor(
 
     private fun getInput(
             request: ImagePageRequest
-    ): Single<List<Image>> = repo
-            .getImages(request.filter, request.page, IMAGE_BLOCK_SIZE)
+    ): Single<List<Image>> = getImages
+            .execute(request.filter, request.page, IMAGE_BLOCK_SIZE)
 }

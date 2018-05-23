@@ -1,12 +1,14 @@
 package com.github.toothpicktest.presentation.screens.images
 
 import com.arellomobile.mvp.InjectViewState
+import com.github.toothpicktest.domain.usecase.GetHistoryTagsUseCase
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
-import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter.Companion
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePaginator
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,7 +17,8 @@ import javax.inject.Inject
 @InjectViewState
 @ImagesScope
 class ImagesPresenter @Inject constructor(
-        private val paginator: ImagePaginator
+        private val paginator: ImagePaginator,
+        private val getHistoryTags: GetHistoryTagsUseCase
 ) : BasePresenter<ImagesView>() {
 
     companion object {
@@ -30,12 +33,32 @@ class ImagesPresenter @Inject constructor(
 
     private val tagRequests = PublishSubject.create<ImageFilter>()
     private val pageRequests = PublishSubject.create<Int>()
+    private val searchTagsRequests = CompositeDisposable()
+    private fun Disposable.bindHistoryTagsRequest() = searchTagsRequests.add(this)
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         observePageRequests()
         tagRequests.onNext(ImageFilter.recent())
         requestNextPage()
+    }
+
+    fun onSearchFocused() {
+        cancelHistoryTagsRequests()
+        getHistoryTags.execute()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ viewState.showHistoryTags(it) }, { /* TODO: */ })
+                .bind()
+                .bindHistoryTagsRequest()
+    }
+
+    fun onSearchLostFocus() {
+        cancelHistoryTagsRequests()
+        viewState.hideHistoryTags()
+    }
+
+    private fun cancelHistoryTagsRequests() {
+        searchTagsRequests.clear()
     }
 
     fun onQueryChanged(newQuery: String) {
@@ -73,7 +96,8 @@ class ImagesPresenter @Inject constructor(
                             .observeOn(AndroidSchedulers.mainThread())
                             .concatMapMaybe { (page, filter) ->
 
-                                paginator.handle(ImagePageRequest(page, lastVisibleItemOrderValue, filter))
+                                paginator.handle(
+                                        ImagePageRequest(page, lastVisibleItemOrderValue, filter))
                                         .filter { /* Could drop images */ it.page > lastLoadedPage }
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .doOnSuccess { lastLoadedPage = it.page }

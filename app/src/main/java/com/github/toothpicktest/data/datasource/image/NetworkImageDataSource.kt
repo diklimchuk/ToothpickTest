@@ -1,4 +1,4 @@
-package com.github.toothpicktest.data.datasource
+package com.github.toothpicktest.data.datasource.image
 
 import com.github.toothpicktest.data.network.FlickrApi
 import com.github.toothpicktest.data.network.entity.image.JsonImage
