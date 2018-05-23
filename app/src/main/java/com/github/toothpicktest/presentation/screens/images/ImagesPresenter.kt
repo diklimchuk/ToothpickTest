@@ -5,7 +5,6 @@ import com.github.toothpicktest.domain.usecase.GetHistoryTagsUseCase
 import com.github.toothpicktest.domain.usecase.RemoveHistoryTagUseCase
 import com.github.toothpicktest.presentation.mvp.BasePresenter
 import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter
-import com.github.toothpicktest.presentation.screens.images.filter.ImageFilter.Companion
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePageRequest
 import com.github.toothpicktest.presentation.screens.images.pagination.ImagePaginator
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -47,6 +46,9 @@ class ImagesPresenter @Inject constructor(
         viewState.hideHistoryTags()
     }
 
+    /*
+     * Search
+     */
     fun onSearchCloseClick() {
         viewState.hideHistoryTags()
         cancelHistoryTagsRequests()
@@ -64,13 +66,27 @@ class ImagesPresenter @Inject constructor(
         viewState.hideHistoryTags()
     }
 
-    private fun cancelHistoryTagsRequests() {
-        searchTagsRequests.clear()
+    fun onSearchQueryChanged(query: String) {
+        cancelHistoryTagsRequests()
+        loadHistoryTags(query)
     }
 
-    fun onQueryChanged(query: String) {
-        searchTagsRequests.clear()
-        loadHistoryTags(query)
+    fun onQuerySubmitted(query: String) {
+        viewState.hideHistoryTags()
+        searchByQuery(query)
+    }
+
+    fun onSearchSuggestionRemoveClick(tag: String) {
+        removeHistoryTag.execute(tag)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({}, this::showError)
+                .bind()
+    }
+
+    fun onSearchSuggestionSelected(suggestion: String) {
+        viewState.showSearchQuery(suggestion)
+        viewState.hideHistoryTags()
+        searchByQuery(suggestion)
     }
 
     private fun loadHistoryTags(query: String = "") {
@@ -81,22 +97,8 @@ class ImagesPresenter @Inject constructor(
                 .bindHistoryTagsRequest()
     }
 
-    fun onSuggestionRemoveClick(tag: String) {
-        removeHistoryTag.execute(tag)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}, this::showError)
-                .bind()
-    }
-
-    fun onHistoryTagSelected(tag: String) {
-        viewState.showSearchQuery(tag)
-        viewState.hideHistoryTags()
-        searchByQuery(tag)
-    }
-
-    fun onQuerySubmitted(query: String) {
-        viewState.hideHistoryTags()
-        searchByQuery(query)
+    private fun cancelHistoryTagsRequests() {
+        searchTagsRequests.clear()
     }
 
     private fun searchByQuery(query: String) {
@@ -108,6 +110,10 @@ class ImagesPresenter @Inject constructor(
         tagRequests.onNext(filter)
         requestNextPage()
     }
+
+    /*
+     * Images
+     */
 
     fun onScrolledToPosition(
             margin: Int

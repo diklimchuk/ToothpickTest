@@ -55,11 +55,11 @@ class MainActivity : BaseActivity(), ImagesView {
         suggestionsAdapter.getSuggestionClicks()
                 .subscribe {
                     search.clearFocus()
-                    presenter.onHistoryTagSelected(it)
+                    presenter.onSearchSuggestionSelected(it)
                 }
                 .bindActive()
         suggestionsAdapter.getRemoveSuggestionClicks()
-                .subscribe { presenter.onSuggestionRemoveClick(it) }
+                .subscribe { presenter.onSearchSuggestionRemoveClick(it) }
                 .bindActive()
         suggestions.adapter = suggestionsAdapter
     }
@@ -73,7 +73,7 @@ class MainActivity : BaseActivity(), ImagesView {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                presenter.onQueryChanged(newText)
+                presenter.onSearchQueryChanged(newText)
                 return true
             }
         })
