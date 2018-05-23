@@ -16,38 +16,28 @@ class ImagePaginator @Inject constructor(
         private const val MAX_ORDER_VALUE = Long.MAX_VALUE
     }
 
-    fun handle(request: ImagePageRequest): Single<ImagePageResult> {
-        return getInput(request)
-                .observeOn(Schedulers.computation())
-                .map { ensureResultDoesntOverlapWithPrevious(request, it) }
-                .map { ImagePageResult(request.page, it, getOrderValue(request, it)) }
-    }
+    fun handle(
+            request: ImagePageRequest
+    ): Single<ImagePageResult> = getInput(request)
+            .observeOn(Schedulers.computation())
+            .map { ensureResultDoesntOverlapWithPrevious(request, it) }
+            .map { ImagePageResult(request.page, it, getOrderValue(request, it)) }
 
     private fun getOrderValue(
             request: ImagePageRequest,
             result: List<Image>
-    ): Long {
-        return if (request.hasTag) {
-            result.minBy { it.uploadDate }?.uploadDate?.time ?: MAX_ORDER_VALUE
-        } else {
-            result.minBy { it.updateDate }?.updateDate?.time ?: MAX_ORDER_VALUE
-        }
-    }
+    ): Long = result.minBy { request.filter.getImageOrderValue(it) }
+                      ?.let { request.filter.getImageOrderValue(it) } ?: MAX_ORDER_VALUE
+
 
     private fun ensureResultDoesntOverlapWithPrevious(
             request: ImagePageRequest,
             result: List<Image>
-    ): List<Image> = if (request.hasTag) {
-        result.filter { it.uploadDate.time < request.orderValueLt }
-    } else {
-        result.filter { it.updateDate.time < request.orderValueLt }
-    }
+    ): List<Image> = result
+            .filter { request.filter.getImageOrderValue(it) < request.orderValueLt }
 
-    private fun getInput(request: ImagePageRequest): Single<List<Image>> {
-        return if (request.hasTag) {
-            repo.getImagesWithTag(request.tag, request.page, IMAGE_BLOCK_SIZE)
-        } else {
-            repo.getImages(request.page, IMAGE_BLOCK_SIZE)
-        }
-    }
+    private fun getInput(
+            request: ImagePageRequest
+    ): Single<List<Image>> = repo
+            .getImages(request.filter, request.page, IMAGE_BLOCK_SIZE)
 }
