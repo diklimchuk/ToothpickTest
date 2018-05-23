@@ -6,19 +6,36 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
+/**
+ * Handles image pagination.
+ *
+ * Uses [ImagePageRequest.filter] and [ImagePageRequest.page] to load image page.
+ * Uses [ImagePageRequest.orderValueLt] to filter out images which could be loaded on any previous
+ * page
+ *
+ * Paginator assumes that all the images can be sorted and applied a unique value in that order.
+ * @see [getOrderValue]
+ * It returns minimum order value in [ImagePageResult.minOrderValue] to be provided with the next
+ * page request.
+ *
+ * Current implementation only supports descending ordering.
+ */
 class ImagePaginator @Inject constructor(
         private val getImages: GetImagesUseCase
 ) {
 
     companion object {
         private const val IMAGE_BLOCK_SIZE = 30
-
-        private const val MAX_ORDER_VALUE = Long.MAX_VALUE
+        /**
+         * Max value which image order can be
+         */
+        const val MAX_ORDER_VALUE = Long.MAX_VALUE
     }
 
     fun handle(
             request: ImagePageRequest
-    ): Single<ImagePageResult> = getInput(request)
+    ): Single<ImagePageResult> = getImages
+            .execute(request.filter, request.page, IMAGE_BLOCK_SIZE)
             .observeOn(Schedulers.computation())
             .map { ensureResultDoesntOverlapWithPrevious(request, it) }
             .map { ImagePageResult(request.page, it, getOrderValue(request, it)) }
@@ -35,9 +52,4 @@ class ImagePaginator @Inject constructor(
             result: List<Image>
     ): List<Image> = result
             .filter { request.filter.getImageOrderValue(it) < request.orderValueLt }
-
-    private fun getInput(
-            request: ImagePageRequest
-    ): Single<List<Image>> = getImages
-            .execute(request.filter, request.page, IMAGE_BLOCK_SIZE)
 }

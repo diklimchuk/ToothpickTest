@@ -24,19 +24,36 @@ class ImagesPresenter @Inject constructor(
 ) : BasePresenter<ImagesView>() {
 
     companion object {
-
+        private const val INITIAL_PAGE_VALUE = 0
         private const val LOAD_THRESHOLD = 20
-
-        private const val MAX_DATE = Long.MAX_VALUE
     }
 
-    private var lastLoadedPage = 0
-    private var lastItemOrderValue = MAX_DATE
-
+    /**
+     * Last page that was loaded by [paginator] for the last tag sent to [tagRequests].
+     * Equals to [INITIAL_PAGE_VALUE] if no pages were loaded yet.
+     */
+    private var lastLoadedPage = INITIAL_PAGE_VALUE
+    /**
+     * Paginator assumes some order for images.
+     * This variable equals to the order value of the last item on the [lastLoadedPage]
+     */
+    private var lastItemOrderValue = ImagePaginator.MAX_ORDER_VALUE
+    /**
+     * Emits tags
+     */
     private val tagRequests = PublishSubject.create<ImageFilter>()
+    /**
+     * Emits page numbers
+     */
     private val pageRequests = PublishSubject.create<Int>()
-    private val searchTagsRequests = CompositeDisposable()
-    private fun Disposable.bindHistoryTagsRequest() = searchTagsRequests.add(this)
+    /**
+     * Emits tag suggestions filters
+     */
+    private val searchTagSuggestionsRequests = CompositeDisposable()
+    /**
+     * Adds [Disposable] to the list of running [searchTagSuggestionsRequests]
+     */
+    private fun Disposable.bindHistoryTagsRequest() = searchTagSuggestionsRequests.add(this)
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -101,7 +118,7 @@ class ImagesPresenter @Inject constructor(
     }
 
     private fun cancelHistoryTagsRequests() {
-        searchTagsRequests.clear()
+        searchTagSuggestionsRequests.clear()
     }
 
     private fun searchRecent() {
@@ -136,8 +153,8 @@ class ImagesPresenter @Inject constructor(
                 .distinctUntilChanged()
                 .switchMap { filter ->
                     viewState.clearImages()
-                    lastLoadedPage = 0
-                    lastItemOrderValue = MAX_DATE
+                    lastLoadedPage = INITIAL_PAGE_VALUE
+                    lastItemOrderValue = ImagePaginator.MAX_ORDER_VALUE
                     pageRequests.map { Pair(it, filter) }
                             .distinctUntilChanged()
                             .observeOn(AndroidSchedulers.mainThread())
@@ -147,7 +164,7 @@ class ImagesPresenter @Inject constructor(
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .doOnSuccess { lastLoadedPage = it.page }
                                         .filter { it.images.isNotEmpty() }
-                                        .doOnSuccess { lastItemOrderValue = it.orderValue }
+                                        .doOnSuccess { lastItemOrderValue = it.minOrderValue }
                             }
                 }
                 .subscribe({ viewState.showImages(it.images) }, this::showError)
