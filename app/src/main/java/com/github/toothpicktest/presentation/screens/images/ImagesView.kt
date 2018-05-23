@@ -30,4 +30,7 @@ interface ImagesView : BaseView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showError(message: String)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun hideSwipeRefresh()
 }

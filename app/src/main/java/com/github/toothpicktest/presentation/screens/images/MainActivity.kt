@@ -12,7 +12,9 @@ import com.github.toothpicktest.R
 import com.github.toothpicktest.di.DiScope
 import com.github.toothpicktest.domain.entity.Image
 import com.github.toothpicktest.presentation.mvp.BaseActivity
+import com.jakewharton.rxbinding2.widget.RxCompoundButton
 import kotlinx.android.synthetic.main.activity_main.images
+import kotlinx.android.synthetic.main.activity_main.refresh
 import kotlinx.android.synthetic.main.activity_main.search
 import kotlinx.android.synthetic.main.activity_main.suggestions
 import kotlinx.android.synthetic.main.activity_main.toolbar
@@ -47,8 +49,13 @@ class MainActivity : BaseActivity(), ImagesView {
 
     override fun onResume() {
         super.onResume()
+        initSwipeRefresh()
         initSearchView()
         initSuggestionsRecycler()
+    }
+
+    private fun initSwipeRefresh() {
+        refresh.setOnRefreshListener { presenter.onRefresh() }
     }
 
     private fun initSuggestionsRecycler() {
@@ -128,6 +135,10 @@ class MainActivity : BaseActivity(), ImagesView {
 
     override fun showImages(images: Collection<Image>) {
         adapter.addImages(images)
+    }
+
+    override fun hideSwipeRefresh() {
+        refresh.isRefreshing = false
     }
 
     override fun showError(message: String) {

@@ -50,6 +50,7 @@ class ImagesPresenter @Inject constructor(
      * Emits tag suggestions filters
      */
     private val searchTagSuggestionsRequests = CompositeDisposable()
+
     /**
      * Adds [Disposable] to the list of running [searchTagSuggestionsRequests]
      */
@@ -135,6 +136,11 @@ class ImagesPresenter @Inject constructor(
      * Images
      */
 
+    fun onRefresh() {
+        clearProgress()
+        requestNextPage()
+    }
+
     fun onScrolledToPosition(
             margin: Int
     ) {
@@ -148,18 +154,22 @@ class ImagesPresenter @Inject constructor(
         pageRequests.onNext(nextPage)
     }
 
+    private fun clearProgress() {
+        viewState.clearImages()
+        lastLoadedPage = INITIAL_PAGE_VALUE
+        lastItemOrderValue = ImagePaginator.MAX_ORDER_VALUE
+    }
+
     private fun observePageRequests() {
         tagRequests
                 .distinctUntilChanged()
                 .switchMap { filter ->
-                    viewState.clearImages()
-                    lastLoadedPage = INITIAL_PAGE_VALUE
-                    lastItemOrderValue = ImagePaginator.MAX_ORDER_VALUE
+                    clearProgress()
                     pageRequests.map { Pair(it, filter) }
                             .distinctUntilChanged()
                             .observeOn(AndroidSchedulers.mainThread())
                             .concatMapMaybe { (page, filter) ->
-                                paginator.handle(ImagePageRequest(page, lastItemOrderValue, filter))
+                                 paginator.handle(ImagePageRequest(page, lastItemOrderValue, filter))
                                         .filter { /* Could drop images */ it.page > lastLoadedPage }
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .doOnSuccess { lastLoadedPage = it.page }
@@ -167,7 +177,10 @@ class ImagesPresenter @Inject constructor(
                                         .doOnSuccess { lastItemOrderValue = it.minOrderValue }
                             }
                 }
-                .subscribe({ viewState.showImages(it.images) }, this::showError)
+                .subscribe({
+                    viewState.hideSwipeRefresh()
+                    viewState.showImages(it.images)
+                }, this::showError)
                 .bind()
     }
 
